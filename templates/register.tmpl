@@ -1,0 +1,14 @@
+<html>
+	<h1>
+		{{ .title }}
+	</h1>
+
+	<h3>회원가입</h3>
+    <form id="user_register" action="/register" method="post">
+        <label for="phone_number">휴대폰 번호:</label>
+        <input type="text" id="phone_number" name="phone_number" required>
+        <label for="password">비밀번호:</label>
+        <input type="text" id="password" name="password" required>
+        <button type="submit">Submit</button>
+    </form>
+</html>

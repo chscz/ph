@@ -1,11 +1,11 @@
 package domain
 
-import "database/sql"
-
 type User struct {
-	ID          int
-	CreatedAt   sql.NullTime
-	PhoneNumber string
-	Password    string
-	AccessedAt  sql.NullTime
+	ID          int    `gorm:"column:id;primaryKey"`
+	PhoneNumber string `gorm:"column:phone_number"`
+	Password    string `gorm:"column:password"`
+}
+
+func (User) TableName() string {
+	return "user"
 }

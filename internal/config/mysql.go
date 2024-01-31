@@ -1,8 +1,9 @@
 package config
 
 type MySQL struct {
-	Username string
+	UserName string
 	Password string
 	Host     string
 	Port     string
+	Schema   string
 }

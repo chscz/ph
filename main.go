@@ -10,13 +10,18 @@ import (
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		//todo
+		panic(err)
 	}
-	_ = cfg
 
-	repo := mysql.InitDB()
-	uh := handler.NewUserHandler(repo)
-	mh := handler.NewMenuHandler(repo)
+	db, err := mysql.InitMYSQL(cfg.MySQL)
+	if err != nil {
+		panic(err)
+	}
+
+	uh := handler.NewUserHandler(mysql.UserRepo{DB: db})
+	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db})
+	//uh := handler.NewUserHandler(nil)
+	//mh := handler.NewProductHandler(nil)
 
 	r := router.InitGin(uh, mh)
 
