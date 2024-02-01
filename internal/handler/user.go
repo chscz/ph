@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -32,15 +31,6 @@ func NewUserHandler(repo UserRepository, auth *auth.UserAuth, jsonRespType bool)
 }
 
 func (uh *UserHandler) LoginPage(c *gin.Context) {
-	if uh.jsonRespType {
-		c.JSON(http.StatusOK, domain.MakeJSONResponse(
-			http.StatusOK,
-			c.Query("message"),
-			nil,
-		))
-		return
-	}
-
 	c.HTML(http.StatusOK, "user_login.tmpl", gin.H{
 		"title":   "로그인",
 		"message": c.Query("message"),
@@ -56,23 +46,7 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	user, err := uh.repo.GetUser(ctx, phoneNumber)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			if uh.jsonRespType {
-				c.JSON(http.StatusUnauthorized, domain.MakeJSONResponse(
-					http.StatusUnauthorized,
-					"not exist user",
-					nil,
-				))
-				return
-			}
 			c.Redirect(http.StatusFound, "/login?message=NotExistUser")
-			return
-		}
-		if uh.jsonRespType {
-			c.JSON(http.StatusInternalServerError, domain.MakeJSONResponse(
-				http.StatusInternalServerError,
-				"internal server error",
-				nil,
-			))
 			return
 		}
 		c.Redirect(http.StatusFound, "/login?message=InternalError")
@@ -80,14 +54,6 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	}
 	// 비밀번호 검사
 	if !uh.Auth.CheckPasswordHash(user.Password, password) {
-		if uh.jsonRespType {
-			c.JSON(http.StatusUnauthorized, domain.MakeJSONResponse(
-				http.StatusUnauthorized,
-				"incorrect password",
-				nil,
-			))
-			return
-		}
 		c.Redirect(http.StatusFound, "/login?message=Unauthorized")
 		return
 	}
@@ -95,7 +61,8 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	// 토큰 발행
 	accessToken, err := uh.Auth.CreateJWT(user.PhoneNumber)
 	if err != nil {
-		//todo
+		c.Redirect(http.StatusFound, "/login?message=InternalErrorCreateJWT")
+		return
 	}
 
 	cookie, err := c.Cookie("access-token")
@@ -148,7 +115,7 @@ func (uh *UserHandler) Register(c *gin.Context) {
 	// 기존 유저 phone number 중복 여부 검사
 	u, err := uh.repo.GetUser(ctx, phoneNumber)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.Redirect(http.StatusFound, "/register?message=InternalError")
+		c.Redirect(http.StatusFound, "/register?message=InternalErrorGetUser")
 		return
 	}
 	if u.PhoneNumber != "" {
@@ -158,7 +125,8 @@ func (uh *UserHandler) Register(c *gin.Context) {
 	// 비밀번호 암호화
 	hashPassword, err := uh.Auth.MakeHashPassword(password)
 	if err != nil {
-		//todo
+		c.Redirect(http.StatusFound, "/register?message=MakeHashError")
+		return
 	}
 
 	user := &domain.User{
@@ -166,8 +134,9 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		Password:    hashPassword,
 	}
 
-	if err := uh.repo.CreateUser(ctx, user); err != nil {
-		fmt.Println(err)
+	if err = uh.repo.CreateUser(ctx, user); err != nil {
+		c.Redirect(http.StatusFound, "/register?message=InternalErrorCreateUser")
+		return
 	}
 
 	c.Redirect(http.StatusFound, "/login")

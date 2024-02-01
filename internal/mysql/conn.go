@@ -10,22 +10,6 @@ import (
 	"time"
 )
 
-//func InitDB() *sql.DB {
-//	connectionString := "root:1111@tcp(127.0.0.1:3306)/ph"
-//	db, err := sql.Open("mysql", connectionString)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	err = db.Ping()
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	fmt.Println("Connected to MySQL!")
-//	return db
-//}
-
 func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {
 	mysqlCfg := &mysql.Config{
 		User:   cfg.UserName,

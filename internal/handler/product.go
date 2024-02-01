@@ -75,10 +75,13 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 		products = products[len(products)-itemsPerPage:]
 	}
 	if err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 목록 조회 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
-
-	//s := domain.MakeJSONResponse(http.StatusOK, "ok", products)
 
 	if len(products) == 0 {
 		c.HTML(http.StatusOK, "home.tmpl", gin.H{
@@ -91,23 +94,14 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 	// 페이징 정보 계산
 	totalCount, err := ph.repo.GetTotalProductCount(ctx)
 	if err != nil {
-		// 에러 처리
-		//c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-		//	"error": "상품 전체 수를 가져오는 중에 오류가 발생했습니다.",
-		//})
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 전체 수 조회 실패",
+			"err_msg": err.Error(),
+		})
 		return
 	}
 	prevPage, nextPage := setProductPage(page, totalCount)
-
-	c.JSON(http.StatusOK, gin.H{
-		"mete": gin.H{
-			"code":    http.StatusOK,
-			"message": "ok",
-		},
-		"data": gin.H{
-			"products": convertFromDomainProductList(products),
-		},
-	})
 
 	c.HTML(http.StatusOK, "home.tmpl", gin.H{
 		"title":       "상품 리스트",
@@ -147,11 +141,21 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 
 	product, err := p.convertToDomainModel()
 	if err != nil {
-		//todo
+		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "상품 도메인 변환 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 
 	if err := ph.repo.CreateProduct(ctx, product); err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 추가 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 	c.Redirect(http.StatusFound, "/")
 }
@@ -162,7 +166,12 @@ func (ph *ProductHandler) UpdateProductPage(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	p, err := ph.repo.GetProduct(ctx, id)
 	if err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "수정할 상품 조회 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 
 	c.HTML(http.StatusOK, "product_update.tmpl", gin.H{
@@ -191,11 +200,21 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 
 	product, err := p.convertToDomainModel()
 	if err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "상품 도메인 변환 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 
 	if err := ph.repo.UpdateProduct(ctx, product); err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 수정 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 	c.Redirect(http.StatusFound, "/")
 }
@@ -206,7 +225,12 @@ func (ph *ProductHandler) DeleteProduct(c *gin.Context) {
 	paramID := c.Param("id")
 	id, _ := strconv.Atoi(paramID)
 	if err := ph.repo.DeleteProduct(ctx, id); err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 삭제 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 }
 
@@ -216,7 +240,12 @@ func (ph *ProductHandler) GetProductDetail(c *gin.Context) {
 	id, _ := strconv.Atoi(paramID)
 	p, err := ph.repo.GetProduct(ctx, id)
 	if err != nil {
-		//todo
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "상품 상세보기 조회 실패",
+			"err_msg": err.Error(),
+		})
+		return
 	}
 
 	c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{
@@ -258,13 +287,19 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 			products = products[len(products)-itemsPerPage:]
 		}
 		if err != nil {
-			//todo
+			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "상품 초성검색 실패",
+				"err_msg": err.Error(),
+			})
+			return
 		}
 		totalCount, err = ph.repo.GetTotalSearchedProductsCountByChoSung(ctx, keyword)
 		if err != nil {
-			// 에러 처리
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"error": "상품 전체 수를 가져오는 중에 오류가 발생했습니다.",
+				"code":    http.StatusInternalServerError,
+				"message": "상품 초성검색 결과 전체 수 조회 실패",
+				"err_msg": err.Error(),
 			})
 			return
 		}
@@ -283,13 +318,19 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 			products = products[len(products)-itemsPerPage:]
 		}
 		if err != nil {
-			//todo
+			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "상품 검색 실패",
+				"err_msg": err.Error(),
+			})
+			return
 		}
 		totalCount, err = ph.repo.GetTotalSearchedProductsCount(ctx, keyword)
 		if err != nil {
-			// 에러 처리
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"error": "상품 전체 수를 가져오는 중에 오류가 발생했습니다.",
+				"code":    http.StatusInternalServerError,
+				"message": "상품 검색 결과 전체 수 조회 실패",
+				"err_msg": err.Error(),
 			})
 			return
 		}

@@ -21,6 +21,6 @@ func LoadConfig() (Config, error) {
 			SecretKey:   "jwtSecretKey",
 			ExpiredTime: 10 * time.Minute,
 		},
-		JSONRespType: true,
+		JSONRespType: false,
 	}, nil
 }

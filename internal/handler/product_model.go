@@ -8,16 +8,16 @@ import (
 	"unicode"
 )
 
-const htmlInputTypeDatetimeLocalFormat = "2006-01-02T15:04"
-
-var hangulChoSung = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"
-
 type ProductSize string
 
 const (
 	ProductSizeLarge ProductSize = "large"
 	ProductSizeSmall ProductSize = "small"
+
+	htmlInputTypeDatetimeLocalFormat = "2006-01-02T15:04"
 )
+
+var hangulChoSung = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"
 
 type Product struct {
 	ID          int         `json:"id"`

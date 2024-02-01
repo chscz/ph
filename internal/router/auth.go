@@ -16,8 +16,6 @@ func AuthMiddleware(jwtKey string) gin.HandlerFunc {
 
 		accessToken, err := c.Cookie("access-token")
 		if err != nil {
-			//todo
-			//c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			c.Redirect(http.StatusFound, "/login")
 			return
@@ -28,8 +26,6 @@ func AuthMiddleware(jwtKey string) gin.HandlerFunc {
 			if ve, ok := err.(*jwt.ValidationError); ok && ve.Errors == jwt.ValidationErrorExpired {
 				c.SetCookie("access-token", "", -1, "/", "", false, true)
 			}
-			//todo
-			//c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			c.Redirect(http.StatusFound, "/login")
 			return
