@@ -1,13 +1,7 @@
 package domain
 
-import "database/sql"
-
-type ProductSize string
-
-const (
-	//todo 다른 값 들어올 때 map?
-	ProductSizeLarge ProductSize = "large"
-	ProductSizeSmall ProductSize = "small"
+import (
+	"database/sql"
 )
 
 type Product struct {
@@ -21,7 +15,7 @@ type Product struct {
 	Description string       `gorm:"column:description"`
 	Barcode     string       `gorm:"column:barcode"`
 	ExpiredAt   sql.NullTime `gorm:"column:expired_at"`
-	Size        ProductSize  `gorm:"column:size"`
+	Size        string       `gorm:"column:size"`
 }
 
 func (Product) TableName() string {

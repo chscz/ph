@@ -2,15 +2,19 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
+	"payhere/internal/auth"
 	"payhere/internal/domain"
 	"regexp"
 )
 
 type UserHandler struct {
 	repo UserRepository
+	Auth *auth.UserAuth
 }
 
 type UserRepository interface {
@@ -18,58 +22,105 @@ type UserRepository interface {
 	GetUser(ctx context.Context, phoneNumber string) (domain.User, error)
 }
 
-func NewUserHandler(repo UserRepository) UserHandler {
-	return UserHandler{repo: repo}
+func NewUserHandler(repo UserRepository, auth *auth.UserAuth) *UserHandler {
+	return &UserHandler{repo: repo, Auth: auth}
 }
 
 func (uh *UserHandler) LoginPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "home.tmpl", gin.H{
-		"title": "Main website",
+	c.HTML(http.StatusOK, "user_login.tmpl", gin.H{
+		"title":   "로그인",
+		"message": c.Query("message"),
 	})
 }
 
 func (uh *UserHandler) Login(c *gin.Context) {
 	ctx := context.Background()
-	pn := c.PostForm("phone_number")
-	pw := c.PostForm("password")
+	phoneNumber := c.PostForm("phone_number")
+	password := c.PostForm("password")
 
-	user, err := uh.repo.GetUser(ctx, pn)
+	// 계정 조회
+	user, err := uh.repo.GetUser(ctx, phoneNumber)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.Redirect(http.StatusFound, "/login?message=NotExistUser")
+			return
+		}
+		c.Redirect(http.StatusFound, "/login?message=InternalError")
+		return
+	}
+	// 비밀번호 검사
+	if !uh.Auth.CheckPasswordHash(user.Password, password) {
+		c.Redirect(http.StatusFound, "/login?message=Unauthorized")
+		return
+	}
+
+	// 토큰 발행
+	accessToken, err := uh.Auth.CreateJWT(user.PhoneNumber)
 	if err != nil {
 		//todo
 	}
 
-	if pw != user.Password {
-		//todo
+	cookie, err := c.Cookie("access-token")
+
+	if err != nil {
+		cookie = "NotSet"
+		c.SetCookie(
+			"access-token",
+			accessToken,
+			3600,
+			"/",
+			"localhost",
+			false,
+			true,
+		)
 	}
-	//todo
-	c.Redirect(http.StatusFound, "/foo")
+	_ = cookie
+
+	c.Redirect(http.StatusFound, "/")
 }
 
 func (uh *UserHandler) RegisterPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "register.tmpl", gin.H{
-		"title": "register page",
+	c.HTML(http.StatusOK, "user_register.tmpl", gin.H{
+		"title":   "회원가입",
+		"message": c.Query("message"),
 	})
 }
 
 func (uh *UserHandler) Register(c *gin.Context) {
 	ctx := context.Background()
-	pn, ok := c.GetPostForm("phone_number")
-	if !ok {
-		//todo
-	}
-	pw, ok := c.GetPostForm("password")
-	if !ok {
-		//todo
-	}
+	phoneNumber := c.PostForm("phone_number")
+	password := c.PostForm("password")
+	passwordConfirm := c.PostForm("password_confirm")
 
-	if !isValidPhoneNumber(pn) {
+	// 휴대폰 번호 유효성 검사
+	if !isValidPhoneNumber(phoneNumber) {
+		c.Redirect(http.StatusFound, "/register?message=InvalidPhoneNumber")
 		return
+	}
+	// 비밀번호 검사
+	if password != passwordConfirm {
+		c.Redirect(http.StatusFound, "/register?message=PasswordsDoNotMatch")
+		return
+	}
+	// 기존 유저 phone number 중복 여부 검사
+	u, err := uh.repo.GetUser(ctx, phoneNumber)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		c.Redirect(http.StatusFound, "/register?message=InternalError")
+		return
+	}
+	if u.PhoneNumber != "" {
+		c.Redirect(http.StatusFound, "/register?message=AlreadyExistPhoneNumber")
+		return
+	}
+	// 비밀번호 암호화
+	hashPassword, err := uh.Auth.MakeHashPassword(password)
+	if err != nil {
+		//todo
 	}
 
 	user := &domain.User{
-		ID:          0,
-		PhoneNumber: pn,
-		Password:    pw,
+		PhoneNumber: phoneNumber,
+		Password:    hashPassword,
 	}
 
 	if err := uh.repo.CreateUser(ctx, user); err != nil {

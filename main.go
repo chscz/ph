@@ -1,6 +1,7 @@
 package main
 
 import (
+	"payhere/internal/auth"
 	"payhere/internal/config"
 	"payhere/internal/handler"
 	"payhere/internal/mysql"
@@ -18,7 +19,8 @@ func main() {
 		panic(err)
 	}
 
-	uh := handler.NewUserHandler(mysql.UserRepo{DB: db})
+	ua := auth.NewUserAuth(cfg.JWT)
+	uh := handler.NewUserHandler(mysql.UserRepo{DB: db}, ua)
 	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db})
 	//uh := handler.NewUserHandler(nil)
 	//mh := handler.NewProductHandler(nil)

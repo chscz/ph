@@ -5,9 +5,11 @@ import (
 	"payhere/internal/handler"
 )
 
-func InitGin(uh handler.UserHandler, mh handler.ProductHandler) *gin.Engine {
+func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
+
+	r.Use(AuthMiddleware(uh.Auth.JWTSecretKey))
 
 	// 로그인  jwt token 기반, 세션유지
 	r.GET("/login", uh.LoginPage)
@@ -25,11 +27,14 @@ func InitGin(uh handler.UserHandler, mh handler.ProductHandler) *gin.Engine {
 	r.GET("/product/create", mh.CreateProductPage)
 	r.POST("/product/create", mh.CreateProduct)
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	r.GET("/product/detail/:id", mh.GetProductDetail)
+
+	r.GET("/product/update/:id", mh.UpdateProductPage)
+	r.POST("/product/update/:id", mh.UpdateProduct)
+
+	r.GET("/product/delete/:id", mh.DeleteProduct)
+
+	r.GET("/product/search", mh.SearchProduct)
 
 	return r
 }

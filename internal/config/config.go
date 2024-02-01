@@ -1,7 +1,10 @@
 package config
 
+import "time"
+
 type Config struct {
 	MySQL MySQL
+	JWT   JWT
 }
 
 func LoadConfig() (Config, error) {
@@ -12,5 +15,11 @@ func LoadConfig() (Config, error) {
 			Host:     "localhost",
 			Port:     "3306",
 			Schema:   "ph",
-		}}, nil
+		},
+		JWT: JWT{
+			SecretKey:   "jwtSecretKey",
+			ExpiredTime: 10 * time.Minute,
+			//ExpiredTime: 30 * time.Second,
+		},
+	}, nil
 }

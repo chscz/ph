@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"payhere/internal/domain"
@@ -16,80 +15,158 @@ type ProductHandler struct {
 
 type ProductRepository interface {
 	CreateProduct(ctx context.Context, product *domain.Product) error
-	UpdateProduct() error
-	DeleteProduct() error
-	GetProductList(ctx context.Context) ([]*domain.Product, error)
-	GetProductDetail() error
+	UpdateProduct(ctx context.Context, product *domain.Product) error
+	DeleteProduct(ctx context.Context, id int) error
+	GetProduct(ctx context.Context, id int) (domain.Product, error)
+	GetProductAllList(ctx context.Context) ([]*domain.Product, error)
+	GetProductSearchList(ctx context.Context, keyword string) ([]*domain.Product, error)
+	GetProductSearchListByChoSung(ctx context.Context, keyword string) ([]*domain.Product, error)
 }
 
-func NewProductHandler(repo ProductRepository) ProductHandler {
-	return ProductHandler{repo: repo}
+func NewProductHandler(repo ProductRepository) *ProductHandler {
+	return &ProductHandler{repo: repo}
 }
 
 func (ph *ProductHandler) Home(c *gin.Context) {
+	// 여기
+
 	ctx := context.Background()
-	products, err := ph.repo.GetProductList(ctx)
+	products, err := ph.repo.GetProductAllList(ctx)
 	if err != nil {
 		//todo
 	}
-	_ = products
 
 	c.HTML(http.StatusOK, "home.tmpl", gin.H{
-		"title": "상품 리스트",
-		//""
+		"title":    "상품 리스트",
+		"products": convertFromDomainProductList(products),
 	})
-	return
 }
 
 func (ph *ProductHandler) CreateProductPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "product_create.tmpl", gin.H{
 		"title": "메뉴 추가하기",
+		"now":   time.Now().Format(htmlInputTypeDatetimeLocalFormat),
 	})
-	return
 }
+
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	ctx := context.Background()
-	category := c.PostForm("category")
-	price := c.PostForm("price")
-	cost := c.PostForm("cost")
-	name := c.PostForm("name")
-	description := c.PostForm("description")
-	barcode := c.PostForm("barcode")
-	expiredAt := c.PostForm("expired_at")
-	_ = expiredAt
-	size := c.PostForm("size")
 
-	p, _ := strconv.Atoi(price)
-	co, _ := strconv.Atoi(cost)
+	price, _ := strconv.Atoi(c.PostForm("price"))
+	cost, _ := strconv.Atoi(c.PostForm("cost"))
+	p := &Product{
+		ID:          0,
+		Category:    c.PostForm("category"),
+		Price:       price,
+		Cost:        cost,
+		Name:        c.PostForm("name"),
+		Description: c.PostForm("description"),
+		Barcode:     c.PostForm("barcode"),
+		ExpiredAt:   c.PostForm("expired_at"),
+		Size:        ProductSize(c.PostForm("size")),
+	}
 
-	product := &domain.Product{
-		Category:    category,
-		Price:       int64(p),
-		Cost:        int64(co),
-		Name:        name,
-		Description: description,
-		Barcode:     barcode,
-		ExpiredAt:   sql.NullTime{Time: time.Now(), Valid: true},
-		Size:        domain.ProductSize(size),
+	product, err := p.convertToDomainModel()
+	if err != nil {
+		//todo
 	}
 
 	if err := ph.repo.CreateProduct(ctx, product); err != nil {
 		//todo
 	}
-	c.HTML(http.StatusOK, "home.tmpl", gin.H{
-		"title": "Main website",
+	c.Redirect(http.StatusFound, "/")
+}
+
+func (ph *ProductHandler) UpdateProductPage(c *gin.Context) {
+	ctx := context.Background()
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	p, err := ph.repo.GetProduct(ctx, id)
+	if err != nil {
+		//todo
+	}
+
+	c.HTML(http.StatusOK, "product_update.tmpl", gin.H{
+		"title":   "메뉴 수정하기",
+		"product": convertFromDomainProduct(&p),
 	})
-	return
 }
 
-func (ph *ProductHandler) Update(c *gin.Context) {
-	return
+func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
+	ctx := context.Background()
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	price, _ := strconv.Atoi(c.PostForm("price"))
+	cost, _ := strconv.Atoi(c.PostForm("cost"))
+	p := &Product{
+		ID:          id,
+		Category:    c.PostForm("category"),
+		Price:       price,
+		Cost:        cost,
+		Name:        c.PostForm("name"),
+		Description: c.PostForm("description"),
+		Barcode:     c.PostForm("barcode"),
+		ExpiredAt:   c.PostForm("expired_at"),
+		Size:        ProductSize(c.PostForm("size")),
+	}
+
+	product, err := p.convertToDomainModel()
+	if err != nil {
+		//todo
+	}
+
+	if err := ph.repo.UpdateProduct(ctx, product); err != nil {
+		//todo
+	}
+	c.Redirect(http.StatusFound, "/")
 }
 
-func (ph *ProductHandler) Delete(c *gin.Context) {
-	return
+func (ph *ProductHandler) DeleteProduct(c *gin.Context) {
+	defer c.Redirect(http.StatusFound, "/")
+	ctx := context.Background()
+	paramID := c.Param("id")
+	id, _ := strconv.Atoi(paramID)
+	if err := ph.repo.DeleteProduct(ctx, id); err != nil {
+		//todo
+	}
 }
 
-func (ph *ProductHandler) Search(c *gin.Context) {
-	return
+func (ph *ProductHandler) GetProductDetail(c *gin.Context) {
+	ctx := context.Background()
+	paramID := c.Param("id")
+	id, _ := strconv.Atoi(paramID)
+	p, err := ph.repo.GetProduct(ctx, id)
+	if err != nil {
+		//todo
+	}
+
+	c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{
+		"title":   "상품 상세보기",
+		"product": convertFromDomainProduct(&p),
+	})
+}
+
+func (ph *ProductHandler) SearchProduct(c *gin.Context) {
+	ctx := context.Background()
+	keyword := c.Query("search_by_name")
+
+	var products []*domain.Product
+	var err error
+	if isOnlyChoSung(keyword) {
+		products, err = ph.repo.GetProductSearchListByChoSung(ctx, keyword)
+		if err != nil {
+			//todo
+		}
+	} else {
+		products, err = ph.repo.GetProductSearchList(ctx, keyword)
+		if err != nil {
+			//todo
+		}
+	}
+
+	c.HTML(http.StatusOK, "home.tmpl", gin.H{
+		"title":         "상품 검색 결과",
+		"SearchKeyword": keyword,
+		"products":      convertFromDomainProductList(products),
+	})
 }

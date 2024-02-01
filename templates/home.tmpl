@@ -1,8 +1,42 @@
 <html>
-	<h1>
-		{{ .title }}
-	</h1>
+	<h1>{{ .title }}</h1>
+
+	<form action="/" method="get">
+            <button type="submit">처음으로</button>
+    </form>
+
 	<form action="/product/create" method="get">
         <button type="submit">메뉴 추가하기</button>
     </form>
+
+    <form id="search_by_name" action="/product/search" method="get">
+        <label for="search_by_name">상품명 검색:</label>
+        <input type="text" id="search_by_name" name="search_by_name" value="{{ .SearchKeyword }}" required>
+        <button type="submit">검색</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Cost</th>
+            <th>Size</th>
+            <th></th>
+        </tr>
+        {{ range .products }}
+            <tr>
+                <td><a href="/product/detail/{{ .ID }}">{{ .Name }}</a></td>
+                <td>{{ .Category }}</td>
+                <td>{{ .Price }}</td>
+                <td>{{ .Cost }}</td>
+                <td>{{ .Size }}</td>
+                <!-- 다른 필드에 대한 값 추가 -->
+                <td>
+                    <a href="/product/update/{{ .ID }}">수정</a>
+                    <a href="/product/delete/{{ .ID }}">삭제</a>
+                </td>
+            </tr>
+        {{ end }}
+    </table>
 </html>

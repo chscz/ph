@@ -1,0 +1,26 @@
+<html>
+	<body>
+	    <h1>{{ .title}}</h1>
+	    <form action="/" method="get">
+                    <button type="submit">처음으로</button>
+        </form>
+
+        <ul>
+            <li>이름: {{ .product.Name }}</li>
+            <li>카테고리: {{ .product.Category }}</li>
+            <li>가격: {{ .product.Price }}</li>
+            <li>원가: {{ .product.Cost }}</li>
+            <li>설명: {{ .product.Description }}</li>
+            <li>바코드: {{ .product.Barcode }}</li>
+            <li>유통기한: {{ .product.ExpiredAt }}</li>
+            <li>사이즈: {{ .product.Size }}</li>
+        </ul>
+
+        <button onclick="location.href='/product/update/{{ .product.ID }}'">수정</button>
+        <button onclick="location.href='/product/delete/{{ .product.ID }}'">삭제</button>
+	</body>
+</html>
+
+
+
+
