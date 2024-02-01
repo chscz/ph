@@ -5,6 +5,9 @@
 	    <form action="/" method="get">
             <button type="submit">처음으로</button>
         </form>
+        <form action="/logout" method="post">
+            <button type="submit">로그아웃</button>
+        </form>
 
 		<form action="/product/update/{{ .product.ID }}" method="post">
             <div>

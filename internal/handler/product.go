@@ -19,7 +19,8 @@ const (
 )
 
 type ProductHandler struct {
-	repo ProductRepository
+	repo         ProductRepository
+	jsonRespType bool
 }
 
 type ProductRepository interface {
@@ -38,8 +39,11 @@ type ProductRepository interface {
 	GetTotalSearchedProductsCountByChoSung(ctx context.Context, keyword string) (int, error)
 }
 
-func NewProductHandler(repo ProductRepository) *ProductHandler {
-	return &ProductHandler{repo: repo}
+func NewProductHandler(repo ProductRepository, jsonRespType bool) *ProductHandler {
+	return &ProductHandler{
+		repo:         repo,
+		jsonRespType: jsonRespType,
+	}
 }
 
 func (ph *ProductHandler) Home(c *gin.Context) {
@@ -74,6 +78,8 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 		//todo
 	}
 
+	//s := domain.MakeJSONResponse(http.StatusOK, "ok", products)
+
 	if len(products) == 0 {
 		c.HTML(http.StatusOK, "home.tmpl", gin.H{
 			"title": "상품 리스트",
@@ -92,6 +98,16 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 		return
 	}
 	prevPage, nextPage := setProductPage(page, totalCount)
+
+	c.JSON(http.StatusOK, gin.H{
+		"mete": gin.H{
+			"code":    http.StatusOK,
+			"message": "ok",
+		},
+		"data": gin.H{
+			"products": convertFromDomainProductList(products),
+		},
+	})
 
 	c.HTML(http.StatusOK, "home.tmpl", gin.H{
 		"title":       "상품 리스트",
@@ -278,6 +294,14 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 			return
 		}
 	}
+
+	if len(products) == 0 {
+		c.HTML(http.StatusOK, "home.tmpl", gin.H{
+			"title": "상품 검색 결과",
+		})
+		return
+	}
+
 	firstItemID, lastItemID := getFirstLastProductID(products)
 
 	prevPage, nextPage := setProductPage(page, totalCount)

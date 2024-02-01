@@ -20,8 +20,8 @@ func main() {
 	}
 
 	ua := auth.NewUserAuth(cfg.JWT)
-	uh := handler.NewUserHandler(mysql.UserRepo{DB: db}, ua)
-	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db})
+	uh := handler.NewUserHandler(mysql.UserRepo{DB: db}, ua, cfg.JSONRespType)
+	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db}, cfg.JSONRespType)
 	//uh := handler.NewUserHandler(nil)
 	//mh := handler.NewProductHandler(nil)
 

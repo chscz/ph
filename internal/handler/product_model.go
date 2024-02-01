@@ -20,15 +20,15 @@ const (
 )
 
 type Product struct {
-	ID          int
-	Category    string
-	Price       int
-	Cost        int
-	Name        string
-	Description string
-	Barcode     string
-	ExpiredAt   string
-	Size        ProductSize
+	ID          int         `json:"id"`
+	Category    string      `json:"category"`
+	Price       int         `json:"price"`
+	Cost        int         `json:"cost"`
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Barcode     string      `json:"barcode"`
+	ExpiredAt   string      `json:"expiredAt"`
+	Size        ProductSize `json:"size"`
 }
 
 func (p Product) convertToDomainModel() (*domain.Product, error) {
@@ -37,7 +37,7 @@ func (p Product) convertToDomainModel() (*domain.Product, error) {
 		return &domain.Product{}, err
 	}
 	return &domain.Product{
-		ID:          p.ID,
+		ID:          int64(p.ID),
 		Category:    p.Category,
 		Price:       int64(p.Price),
 		Cost:        int64(p.Cost),
@@ -62,7 +62,7 @@ func convertFromDomainProductList(products []*domain.Product) []*Product {
 
 func convertFromDomainProduct(p *domain.Product) *Product {
 	return &Product{
-		ID:          p.ID,
+		ID:          int(p.ID),
 		Category:    p.Category,
 		Price:       int(p.Price),
 		Cost:        int(p.Cost),
@@ -87,8 +87,8 @@ func isOnlyChoSung(str string) bool {
 }
 
 func getFirstLastProductID(items []*domain.Product) (first, last int) {
-	first = items[0].ID
-	last = items[len(items)-1].ID
+	first = int(items[0].ID)
+	last = int(items[len(items)-1].ID)
 	return
 }
 

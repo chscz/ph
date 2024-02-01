@@ -3,8 +3,9 @@ package config
 import "time"
 
 type Config struct {
-	MySQL MySQL
-	JWT   JWT
+	MySQL        MySQL
+	JWT          JWT
+	JSONRespType bool
 }
 
 func LoadConfig() (Config, error) {
@@ -19,7 +20,7 @@ func LoadConfig() (Config, error) {
 		JWT: JWT{
 			SecretKey:   "jwtSecretKey",
 			ExpiredTime: 10 * time.Minute,
-			//ExpiredTime: 30 * time.Second,
 		},
+		JSONRespType: true,
 	}, nil
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type Product struct {
-	ID          int          `gorm:"column:id;primaryKey"`
+	ID          int64        `gorm:"column:id;primaryKey"`
 	CreatedAt   sql.NullTime `gorm:"column:created_at"`
 	UpdatedAt   sql.NullTime `gorm:"column:updated_at"`
 	Category    string       `gorm:"column:category"`
@@ -21,6 +21,3 @@ type Product struct {
 func (Product) TableName() string {
 	return "product"
 }
-
-//todo
-//타입 설정, json/gorm 추가, time 타입, size 타입

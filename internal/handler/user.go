@@ -13,8 +13,9 @@ import (
 )
 
 type UserHandler struct {
-	repo UserRepository
-	Auth *auth.UserAuth
+	repo         UserRepository
+	Auth         *auth.UserAuth
+	jsonRespType bool
 }
 
 type UserRepository interface {
@@ -22,11 +23,24 @@ type UserRepository interface {
 	GetUser(ctx context.Context, phoneNumber string) (domain.User, error)
 }
 
-func NewUserHandler(repo UserRepository, auth *auth.UserAuth) *UserHandler {
-	return &UserHandler{repo: repo, Auth: auth}
+func NewUserHandler(repo UserRepository, auth *auth.UserAuth, jsonRespType bool) *UserHandler {
+	return &UserHandler{
+		repo:         repo,
+		Auth:         auth,
+		jsonRespType: jsonRespType,
+	}
 }
 
 func (uh *UserHandler) LoginPage(c *gin.Context) {
+	if uh.jsonRespType {
+		c.JSON(http.StatusOK, domain.MakeJSONResponse(
+			http.StatusOK,
+			c.Query("message"),
+			nil,
+		))
+		return
+	}
+
 	c.HTML(http.StatusOK, "user_login.tmpl", gin.H{
 		"title":   "로그인",
 		"message": c.Query("message"),
@@ -42,7 +56,23 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	user, err := uh.repo.GetUser(ctx, phoneNumber)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if uh.jsonRespType {
+				c.JSON(http.StatusUnauthorized, domain.MakeJSONResponse(
+					http.StatusUnauthorized,
+					"not exist user",
+					nil,
+				))
+				return
+			}
 			c.Redirect(http.StatusFound, "/login?message=NotExistUser")
+			return
+		}
+		if uh.jsonRespType {
+			c.JSON(http.StatusInternalServerError, domain.MakeJSONResponse(
+				http.StatusInternalServerError,
+				"internal server error",
+				nil,
+			))
 			return
 		}
 		c.Redirect(http.StatusFound, "/login?message=InternalError")
@@ -50,6 +80,14 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	}
 	// 비밀번호 검사
 	if !uh.Auth.CheckPasswordHash(user.Password, password) {
+		if uh.jsonRespType {
+			c.JSON(http.StatusUnauthorized, domain.MakeJSONResponse(
+				http.StatusUnauthorized,
+				"incorrect password",
+				nil,
+			))
+			return
+		}
 		c.Redirect(http.StatusFound, "/login?message=Unauthorized")
 		return
 	}
@@ -77,6 +115,11 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	_ = cookie
 
 	c.Redirect(http.StatusFound, "/")
+}
+
+func (uh *UserHandler) Logout(c *gin.Context) {
+	defer c.Redirect(http.StatusFound, "/login")
+	c.SetCookie("access-token", "", -1, "/", "", false, true)
 }
 
 func (uh *UserHandler) RegisterPage(c *gin.Context) {
