@@ -85,3 +85,26 @@ func isOnlyChoSung(str string) bool {
 	}
 	return true
 }
+
+func getFirstLastProductID(items []*domain.Product) (first, last int) {
+	first = items[0].ID
+	last = items[len(items)-1].ID
+	return
+}
+
+func setProductPage(page, totalCount int) (prevPage, nextPage int) {
+	// 이전 페이지와 다음 페이지를 계산
+	prevPage = page - 1
+	nextPage = page + 1
+
+	// 이전 페이지가 1보다 작으면 이전 페이지는 1로 설정
+	if prevPage < 1 {
+		prevPage = 1
+	}
+
+	// 다음 페이지가 마지막 페이지를 넘어가면 다음 페이지는 마지막 페이지로 설정
+	if nextPage > (totalCount+itemsPerPage-1)/itemsPerPage {
+		nextPage = (totalCount + itemsPerPage - 1) / itemsPerPage
+	}
+	return
+}

@@ -41,19 +41,21 @@
     </table>
 
     <div>
-        <form action="/" method="get">
+        <form action="/product/search" method="get">
             <input type="hidden" name="page" value="{{ .prevPage }}">
             <input type="hidden" name="mode" value="prev">
             <input type="hidden" name="cursor" value="{{ .firstItemID }}">
+            <input type="hidden" name="search_by_name" value="{{ .SearchKeyword }}">
             <button type="submit" {{ if le .currentPage 1 }}disabled{{ end }}>이전 페이지</button>
         </form>
 
         <span>현재 페이지: {{ .currentPage }} / 총 페이지: {{ .totalPages }}</span>
 
-        <form action="/" method="get">
+        <form action="/product/search" method="get">
             <input type="hidden" name="page" value="{{ .nextPage }}">
             <input type="hidden" name="mode" value="next">
             <input type="hidden" name="cursor" value="{{ .lastItemID }}">
+            <input type="hidden" name="search_by_name" value="{{ .SearchKeyword }}">
             <button type="submit" {{ if ge .currentPage .totalPages }}disabled{{ end }}>다음 페이지</button>
         </form>
     </div>
