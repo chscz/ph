@@ -2,7 +2,8 @@ package mysql
 
 import (
 	"context"
-	"payhere/internal/domain"
+
+	"github.com/chscz/ph/internal/domain"
 )
 
 func (r ProductRepo) CreateProduct(ctx context.Context, product *domain.Product) error {

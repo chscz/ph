@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
-	"payhere/internal/auth"
-	"payhere/internal/config"
-	"payhere/internal/handler"
-	"payhere/internal/mysql"
-	"payhere/internal/router"
+	"github.com/chscz/ph/internal/auth"
+	"github.com/chscz/ph/internal/config"
+	"github.com/chscz/ph/internal/handler"
+	"github.com/chscz/ph/internal/mysql"
+	"github.com/chscz/ph/internal/router"
 )
 
 func main() {

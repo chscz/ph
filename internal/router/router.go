@@ -1,8 +1,8 @@
 package router
 
 import (
+	"github.com/chscz/ph/internal/handler"
 	"github.com/gin-gonic/gin"
-	"payhere/internal/handler"
 )
 
 func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {

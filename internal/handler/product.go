@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"payhere/internal/domain"
 	"strconv"
 	"time"
+
+	"github.com/chscz/ph/internal/domain"
+	"github.com/gin-gonic/gin"
 )
 
 const itemsPerPage = 10
@@ -76,16 +77,18 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 	}
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 목록 조회 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 목록 조회 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
 
 	if len(products) == 0 {
 		c.HTML(http.StatusOK, "home.tmpl", gin.H{
-			"title": "상품 리스트",
+			"title":    "상품 리스트",
+			"response": domain.MakeJSONResponse(http.StatusOK, "등록된 상품 없음", nil),
 		})
 		return
 	}
@@ -95,9 +98,10 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 	totalCount, err := ph.repo.GetTotalProductCount(ctx)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 전체 수 조회 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 전체 수 조회 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
@@ -112,13 +116,20 @@ func (ph *ProductHandler) Home(c *gin.Context) {
 		"prevPage":    prevPage,
 		"nextPage":    nextPage,
 		"totalPages":  (totalCount + itemsPerPage - 1) / itemsPerPage,
+		"response": domain.MakeJSONResponse(
+			http.StatusOK,
+			"ok",
+			map[string]interface{}{
+				"products": convertFromDomainProductList(products),
+			}),
 	})
 }
 
 func (ph *ProductHandler) CreateProductPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "product_create.tmpl", gin.H{
-		"title": "메뉴 추가하기",
-		"now":   time.Now().Format(htmlInputTypeDatetimeLocalFormat),
+		"title":    "메뉴 추가하기",
+		"now":      time.Now().Format(htmlInputTypeDatetimeLocalFormat),
+		"response": domain.MakeJSONResponse(http.StatusOK, "ok", nil),
 	})
 }
 
@@ -142,18 +153,20 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	product, err := p.convertToDomainModel()
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "상품 도메인 변환 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusBadRequest,
+			"message":  "상품 도메인 변환 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusBadRequest, err.Error(), nil),
 		})
 		return
 	}
 
-	if err := ph.repo.CreateProduct(ctx, product); err != nil {
+	if err = ph.repo.CreateProduct(ctx, product); err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 추가 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 추가 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusBadRequest, err.Error(), nil),
 		})
 		return
 	}
@@ -167,9 +180,10 @@ func (ph *ProductHandler) UpdateProductPage(c *gin.Context) {
 	p, err := ph.repo.GetProduct(ctx, id)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "수정할 상품 조회 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "수정할 상품 조회 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
@@ -177,6 +191,12 @@ func (ph *ProductHandler) UpdateProductPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "product_update.tmpl", gin.H{
 		"title":   "메뉴 수정하기",
 		"product": convertFromDomainProduct(&p),
+		"response": domain.MakeJSONResponse(
+			http.StatusOK,
+			"ok",
+			map[string]interface{}{
+				"products": convertFromDomainProduct(&p),
+			}),
 	})
 }
 
@@ -201,18 +221,20 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 	product, err := p.convertToDomainModel()
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "상품 도메인 변환 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusBadRequest,
+			"message":  "상품 도메인 변환 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
 
-	if err := ph.repo.UpdateProduct(ctx, product); err != nil {
+	if err = ph.repo.UpdateProduct(ctx, product); err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 수정 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 수정 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
@@ -226,9 +248,10 @@ func (ph *ProductHandler) DeleteProduct(c *gin.Context) {
 	id, _ := strconv.Atoi(paramID)
 	if err := ph.repo.DeleteProduct(ctx, id); err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 삭제 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 삭제 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
@@ -241,9 +264,10 @@ func (ph *ProductHandler) GetProductDetail(c *gin.Context) {
 	p, err := ph.repo.GetProduct(ctx, id)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "상품 상세보기 조회 실패",
-			"err_msg": err.Error(),
+			"code":     http.StatusInternalServerError,
+			"message":  "상품 상세보기 조회 실패",
+			"err_msg":  err.Error(),
+			"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 		})
 		return
 	}
@@ -251,6 +275,12 @@ func (ph *ProductHandler) GetProductDetail(c *gin.Context) {
 	c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{
 		"title":   "상품 상세보기",
 		"product": convertFromDomainProduct(&p),
+		"response": domain.MakeJSONResponse(
+			http.StatusOK,
+			"ok",
+			map[string]interface{}{
+				"products": convertFromDomainProduct(&p),
+			}),
 	})
 }
 
@@ -288,18 +318,20 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 		}
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "상품 초성검색 실패",
-				"err_msg": err.Error(),
+				"code":     http.StatusInternalServerError,
+				"message":  "상품 초성검색 실패",
+				"err_msg":  err.Error(),
+				"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 			})
 			return
 		}
 		totalCount, err = ph.repo.GetTotalSearchedProductsCountByChoSung(ctx, keyword)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "상품 초성검색 결과 전체 수 조회 실패",
-				"err_msg": err.Error(),
+				"code":     http.StatusInternalServerError,
+				"message":  "상품 초성검색 결과 전체 수 조회 실패",
+				"err_msg":  err.Error(),
+				"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 			})
 			return
 		}
@@ -319,18 +351,20 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 		}
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "상품 검색 실패",
-				"err_msg": err.Error(),
+				"code":     http.StatusInternalServerError,
+				"message":  "상품 검색 실패",
+				"err_msg":  err.Error(),
+				"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 			})
 			return
 		}
 		totalCount, err = ph.repo.GetTotalSearchedProductsCount(ctx, keyword)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "상품 검색 결과 전체 수 조회 실패",
-				"err_msg": err.Error(),
+				"code":     http.StatusInternalServerError,
+				"message":  "상품 검색 결과 전체 수 조회 실패",
+				"err_msg":  err.Error(),
+				"response": domain.MakeJSONResponse(http.StatusInternalServerError, err.Error(), nil),
 			})
 			return
 		}
@@ -338,7 +372,8 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 
 	if len(products) == 0 {
 		c.HTML(http.StatusOK, "home.tmpl", gin.H{
-			"title": "상품 검색 결과",
+			"title":    "상품 검색 결과",
+			"response": domain.MakeJSONResponse(http.StatusOK, "검색결과 없음", nil),
 		})
 		return
 	}
@@ -357,5 +392,11 @@ func (ph *ProductHandler) SearchProduct(c *gin.Context) {
 		"prevPage":      prevPage,
 		"nextPage":      nextPage,
 		"totalPages":    (totalCount + itemsPerPage - 1) / itemsPerPage,
+		"response": domain.MakeJSONResponse(
+			http.StatusOK,
+			"ok",
+			map[string]interface{}{
+				"products": convertFromDomainProductList(products),
+			}),
 	})
 }

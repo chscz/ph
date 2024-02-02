@@ -1,10 +1,11 @@
 package router
 
 import (
+	"net/http"
+
+	"github.com/chscz/ph/internal/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"net/http"
-	"payhere/internal/auth"
 )
 
 func AuthMiddleware(jwtKey string) gin.HandlerFunc {

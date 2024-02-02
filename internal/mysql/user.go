@@ -2,7 +2,8 @@ package mysql
 
 import (
 	"context"
-	"payhere/internal/domain"
+
+	"github.com/chscz/ph/internal/domain"
 )
 
 func (r UserRepo) CreateUser(ctx context.Context, user *domain.User) error {

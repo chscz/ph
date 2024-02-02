@@ -2,12 +2,13 @@ package mysql
 
 import (
 	"fmt"
+	"net"
+	"time"
+
+	"github.com/chscz/ph/internal/config"
 	"github.com/go-sql-driver/mysql"
 	gormmysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"net"
-	"payhere/internal/config"
-	"time"
 )
 
 func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {

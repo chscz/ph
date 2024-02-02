@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"payhere/internal/config"
+	"github.com/chscz/ph/internal/config"
 )
 
 type UserAuth struct {
