@@ -2,8 +2,9 @@ package auth
 
 import (
 	"errors"
-	"github.com/golang-jwt/jwt"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type Claims struct {
@@ -18,7 +19,7 @@ func (ua *UserAuth) CreateJWT(phoneNumber string) (string, error) {
 	aToken := jwt.New(jwt.SigningMethodHS256)
 	claims := aToken.Claims.(jwt.MapClaims)
 	claims["phone_number"] = phoneNumber
-	claims["exp"] = time.Now().Add(ua.JWTExpiredTime).Unix()
+	claims["exp"] = time.Now().Add(time.Duration(ua.JWTExpiredMinute) * time.Minute).Unix()
 
 	tk, err := aToken.SignedString(mySigningKey)
 	if err != nil {

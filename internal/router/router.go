@@ -11,6 +11,8 @@ func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {
 
 	r.Use(AuthMiddleware(uh.Auth.JWTSecretKey))
 
+	r.GET("/", mh.Home)
+
 	r.GET("/login", uh.LoginPage)
 	r.POST("/login", uh.Login)
 	r.POST("/logout", uh.Logout)
@@ -18,18 +20,19 @@ func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {
 	r.GET("/register", uh.RegisterPage)
 	r.POST("/register", uh.Register)
 
-	r.GET("/", mh.Home)
-	r.GET("/product/create", mh.CreateProductPage)
-	r.POST("/product/create", mh.CreateProduct)
+	productGroup := r.Group("/product")
+	{
+		productGroup.GET("/create", mh.CreateProductPage)
+		productGroup.POST("/create", mh.CreateProduct)
 
-	r.GET("/product/detail/:id", mh.GetProductDetail)
+		productGroup.GET("/update/:id", mh.UpdateProductPage)
+		productGroup.POST("/update/:id", mh.UpdateProduct)
 
-	r.GET("/product/update/:id", mh.UpdateProductPage)
-	r.POST("/product/update/:id", mh.UpdateProduct)
+		productGroup.GET("/delete/:id", mh.DeleteProduct)
 
-	r.GET("/product/delete/:id", mh.DeleteProduct)
-
-	r.GET("/product/search", mh.SearchProduct)
+		productGroup.GET("/detail/:id", mh.GetProductDetail)
+		productGroup.GET("/search", mh.SearchProduct)
+	}
 
 	return r
 }

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"payhere/internal/auth"
 	"payhere/internal/config"
 	"payhere/internal/handler"
@@ -9,7 +12,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadConfig()
+	cfg, err := config.LoadFromEnv()
 	if err != nil {
 		panic(err)
 	}
@@ -22,10 +25,11 @@ func main() {
 	ua := auth.NewUserAuth(cfg.JWT)
 	uh := handler.NewUserHandler(mysql.UserRepo{DB: db}, ua, cfg.JSONRespType)
 	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db}, cfg.JSONRespType)
-	//uh := handler.NewUserHandler(nil)
-	//mh := handler.NewProductHandler(nil)
 
 	r := router.InitGin(uh, mh)
 
-	r.Run() // 서버가 실행 되고 0.0.0.0:8080 에서 요청을 기다립니다.
+	if err = r.Run(); err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 }

@@ -1,26 +1,39 @@
 package config
 
-import "time"
+import (
+	"github.com/caarlos0/env/v10"
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
-	MySQL        MySQL
-	JWT          JWT
-	JSONRespType bool
+	MySQL        MySQL `envPrefix:"MYSQL_"`
+	JWT          JWT   `envPrefix:"JWT_"`
+	JSONRespType bool  `envPrefix:"JSON_RESP_TYPE_"`
 }
 
-func LoadConfig() (Config, error) {
-	return Config{
+func LoadFromEnv() (Config, error) {
+	cfg := Config{
 		MySQL: MySQL{
-			UserName: "root",
-			Password: "1111",
-			Host:     "localhost",
-			Port:     "3306",
-			Schema:   "ph",
+			UserName: "",
+			Password: "",
+			Host:     "",
+			Port:     "",
+			Schema:   "",
 		},
 		JWT: JWT{
-			SecretKey:   "jwtSecretKey",
-			ExpiredTime: 10 * time.Minute,
+			SecretKey:     "",
+			ExpiredMinute: 0,
 		},
 		JSONRespType: false,
-	}, nil
+	}
+
+	// .env -> 환경변수 등록
+	if err := godotenv.Load(".env"); err != nil {
+		return Config{}, err
+	}
+	// 환경변수 -> Config{} 등록
+	if err := env.Parse(&cfg); err != nil {
+		return Config{}, err
+	}
+	return cfg, nil
 }

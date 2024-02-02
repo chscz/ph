@@ -2,17 +2,16 @@ package auth
 
 import (
 	"payhere/internal/config"
-	"time"
 )
 
 type UserAuth struct {
-	JWTSecretKey   string
-	JWTExpiredTime time.Duration
+	JWTSecretKey     string
+	JWTExpiredMinute int
 }
 
 func NewUserAuth(jwt config.JWT) *UserAuth {
 	return &UserAuth{
-		JWTSecretKey:   jwt.SecretKey,
-		JWTExpiredTime: jwt.ExpiredTime,
+		JWTSecretKey:     jwt.SecretKey,
+		JWTExpiredMinute: jwt.ExpiredMinute,
 	}
 }

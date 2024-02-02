@@ -1,8 +1,6 @@
 package config
 
-import "time"
-
 type JWT struct {
-	SecretKey   string
-	ExpiredTime time.Duration
+	SecretKey     string `env:"SECRET_KEY"`
+	ExpiredMinute int    `env:"EXPIRED_MINUTE"`
 }
