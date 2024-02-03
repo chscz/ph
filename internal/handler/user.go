@@ -65,7 +65,7 @@ func (uh *UserHandler) Login(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/login?message=InternalErrorCreateJWT")
 		return
 	}
-
+	// 쿠키 생성
 	cookie, err := c.Cookie("access-token")
 
 	if err != nil {
@@ -134,7 +134,7 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		PhoneNumber: phoneNumber,
 		Password:    hashPassword,
 	}
-
+	// db 저장
 	if err = uh.repo.CreateUser(ctx, user); err != nil {
 		c.Redirect(http.StatusFound, "/register?message=InternalErrorCreateUser")
 		return
