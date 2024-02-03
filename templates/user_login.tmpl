@@ -1,4 +1,35 @@
 <html>
+    <head>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById("user_register").addEventListener("submit", function(event) {
+                    event.preventDefault();
+
+                    const formData = new FormData(event.target);
+
+                    fetch("/login", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("data!!:", data);
+                        console.log("meta!!:", data[meta]);
+                        console.log("message!!:", data.meta.message);
+
+                      if (data.meta && data.meta.message) {
+                            document.querySelector(".message").innerHTML = data.meta.message;
+                        } else {
+                            console.error("Error: 'message' not found in server response.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+                });
+            });
+        </script>
+    </head>
 	<h1>{{ .title }}</h1>
 
     <form id="user_register" action="/login" method="post">
@@ -11,5 +42,6 @@
     <form action="/register" method="get">
         <button type="submit">회원가입</button>
     </form>
-    {{ .message}}
+    <br>
+    <div class="message"></div>
 </html>

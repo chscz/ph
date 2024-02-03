@@ -47,10 +47,19 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	user, err := uh.repo.GetUser(ctx, phoneNumber)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.Redirect(http.StatusFound, "/login?message=NotExistUser")
+			//c.Redirect(http.StatusFound, "/login?message=NotExistUser")
+			c.JSON(http.StatusUnauthorized, domain.MakeJSONResponse(
+				http.StatusUnauthorized,
+				"계정 정보가 없습니다.",
+				nil,
+			))
 			return
 		}
-		c.Redirect(http.StatusFound, "/login?message=InternalError")
+		c.JSON(http.StatusFound, domain.MakeJSONResponse(
+			http.StatusInternalServerError,
+			"계정 조회 중 서버 오류",
+			nil,
+		))
 		return
 	}
 	// 비밀번호 검사
