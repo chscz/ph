@@ -5,5 +5,5 @@ type MySQL struct {
 	Password string `env:"PASSWORD"`
 	Host     string `env:"HOST"`
 	Port     string `env:"PORT"`
-	Schema   string `env:"SCHEMA"`
+	DB       string `env:"DB"`
 }

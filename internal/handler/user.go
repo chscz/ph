@@ -140,7 +140,7 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/login")
+	c.Redirect(http.StatusFound, "/login?message=SuccessCreateAccount")
 }
 
 func isValidPhoneNumber(phoneNumber string) bool {

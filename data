@@ -1,0 +1,36 @@
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('음료', 4000, 1500, '커피','ㅇㅇ', 121212, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('음료', 4000, 1500, '디저트','ㄱㄹㄹ', 121212, NOW(), 'large');
+
+
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 5800, 580, '나이트로 바닐라 크림','나바크 작은거', 100101, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 6300, 630, '나이트로 바닐라 크림','나바크 큰거', 100102, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 19600, 1960, '시그니처 더 블랙 콜드 브루','시더블콜브', 100103, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 6000, 600, '돌체 콜드 브루','돌콜브 작은거', 100104, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 6500, 650, '돌체 콜드 브루','돌콜브 큰거', 100105, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 5800, 580, '바닐라 크림 콜드 브루','바크콜브 작은거', 100106, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 6300, 630, '바닐라 크림 콜드 브루','바크콜브 큰거', 100107, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 4900, 490, '콜드 브루','콜브 작은거', 100108, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('콜드브루 커피', 5400, 540, '콜드 브루','콜브 큰거', 100109, NOW(), 'large');
+
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('피지오', 5900, 590, '쿨 라임 피지오','쿨라피 작은거', 100201, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('피지오', 6400, 640, '쿨 라임 피지오','쿨라피 큰거', 100202, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('피지오', 5700, 570, '피치 딸기 피지오','피딸피 작은거', 100203, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('피지오', 6200, 620, '푸치 딸기 피지오','피딸피 큰거', 100204, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('피지오', 5900, 590, '유자 패션 피지오','유패피 작은거', 100205, NOW(), 'small');
+
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 5900, 590, '망고 용과 레모네이드 스타벅스 리프레셔','망용레스리 작은거', 100301, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 6400, 640, '망고 용과 레모네이드 스타벅스 리프레셔','망용레스리 큰거', 100302, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 5900, 590, '피플 드링크 위드 망고 용과 스타벅스 리프레셔','피드위망용스리 작은거', 100303, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 6400, 640, '피플 드링크 위드 망고 용과 스타벅스 리프레셔','피드위망용스리 큰거', 100304, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 5900, 590, '딸기 아사이 레모네이드 스타벅스 리프레셔','딸아레스리 작은거', 100305, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 6400, 640, '딸기 아사이 레모네이드 스타벅스 리프레셔','딸아레스리 큰거', 100306, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 5900, 590, '핑크 드링크 위드 딸기 아사이 스타벅스 리프레셔','핑드위딸아스리 작은거', 100307, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('리프레셔', 6400, 640, '핑크 드링크 위드 딸기 아사이 스타벅스 리프레셔','핑드위딸아스리 큰거', 100308, NOW(), 'large');
+
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 5900, 590, '블론드 바닐라 더블샷 마키아또','블바더마 큰거', 100401, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 5400, 540, '블론드 스타벅스 돌체 라떼','블스돌라 작은거', 100402, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 5900, 590, '블론드 스타벅스 돌체 라떼','블스돌라 큰거', 100403, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 4500, 450, '블론드 카페라떼','블카 작은거', 100404, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 5000, 500, '블론드 카페라떼','블카 큰거', 100405, NOW(), 'large');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 4000, 400, '블론드 카페 아메리카노','블바더마 작은거', 100406, NOW(), 'small');
+INSERT INTO product(category, price, cost, NAME, DESCRIPTION, barcode, expired_at, size) VALUES('블론드', 4500, 450, '블론드 카페 아메리카노','블바더마 큰거', 100407, NOW(), 'large');

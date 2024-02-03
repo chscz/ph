@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"time"
 
@@ -17,7 +18,7 @@ func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {
 		Passwd: cfg.Password,
 		Net:    "tcp",
 		Addr:   net.JoinHostPort(cfg.Host, cfg.Port),
-		DBName: cfg.Schema,
+		DBName: cfg.DB,
 		Params: map[string]string{
 			"charset": "utf8mb4",
 		},
@@ -25,11 +26,19 @@ func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {
 		AllowNativePasswords: true,
 		ParseTime:            true,
 	}
-	dsn := mysqlCfg.FormatDSN()
 
-	db, err := gorm.Open(gormmysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, fmt.Errorf("gorm open failed : %w", err)
+	var db *gorm.DB
+	var err error
+	retryCount := 10
+	for i := 0; i < retryCount; i++ {
+		dsn := mysqlCfg.FormatDSN()
+		db, err = gorm.Open(gormmysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+
+		log.Printf("Failed to connect to MySQL. Retrying (%d/%d)...\n", i+1, retryCount)
+		time.Sleep(time.Second * 5)
 	}
 
 	conn, err := db.DB()

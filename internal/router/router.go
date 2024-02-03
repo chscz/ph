@@ -5,13 +5,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {
+func InitGin(uh *handler.UserHandler, ph *handler.ProductHandler) *gin.Engine {
 	r := gin.Default()
-	r.LoadHTMLGlob("templates/*")
+
+	// intellij debug 환경
+	//r.LoadHTMLGlob("templates/*")
+	// docker 환경
+	r.LoadHTMLGlob("/app/templates/*")
 
 	r.Use(AuthMiddleware(uh.Auth.JWTSecretKey))
 
-	r.GET("/", mh.Home)
+	r.GET("/", ph.Home)
 
 	r.GET("/login", uh.LoginPage)
 	r.POST("/login", uh.Login)
@@ -22,16 +26,16 @@ func InitGin(uh *handler.UserHandler, mh *handler.ProductHandler) *gin.Engine {
 
 	productGroup := r.Group("/product")
 	{
-		productGroup.GET("/create", mh.CreateProductPage)
-		productGroup.POST("/create", mh.CreateProduct)
+		productGroup.GET("/create", ph.CreateProductPage)
+		productGroup.POST("/create", ph.CreateProduct)
 
-		productGroup.GET("/update/:id", mh.UpdateProductPage)
-		productGroup.POST("/update/:id", mh.UpdateProduct)
+		productGroup.GET("/update/:id", ph.UpdateProductPage)
+		productGroup.POST("/update/:id", ph.UpdateProduct)
 
-		productGroup.GET("/delete/:id", mh.DeleteProduct)
+		productGroup.GET("/delete/:id", ph.DeleteProduct)
 
-		productGroup.GET("/detail/:id", mh.GetProductDetail)
-		productGroup.GET("/search", mh.SearchProduct)
+		productGroup.GET("/detail/:id", ph.GetProductDetail)
+		productGroup.GET("/search", ph.SearchProduct)
 	}
 
 	return r

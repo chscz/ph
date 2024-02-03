@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -12,13 +13,19 @@ import (
 )
 
 func main() {
+	log.Println("start!!")
 	cfg, err := config.LoadFromEnv()
 	if err != nil {
+		fmt.Println(err)
+		log.Println(err)
 		panic(err)
 	}
+	log.Println(cfg)
 
 	db, err := mysql.InitMYSQL(cfg.MySQL)
 	if err != nil {
+		fmt.Println(err)
+		log.Println(err)
 		panic(err)
 	}
 
@@ -29,6 +36,7 @@ func main() {
 	r := router.InitGin(uh, mh)
 
 	if err = r.Run(); err != nil {
+		fmt.Println(err)
 		log.Println(err)
 		os.Exit(1)
 	}
