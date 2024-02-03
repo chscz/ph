@@ -55,7 +55,7 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	}
 	// 비밀번호 검사
 	if !uh.Auth.CheckPasswordHash(user.Password, password) {
-		c.Redirect(http.StatusFound, "/login?message=Unauthorized")
+		c.Redirect(http.StatusFound, "/login?message=IncorrectPassword")
 		return
 	}
 

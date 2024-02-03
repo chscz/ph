@@ -18,6 +18,7 @@ services:
       JWT_EXPIRED_MINUTE: 10
   mysql:
     image: mysql:5.7
+    platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: "1111"
     ports:

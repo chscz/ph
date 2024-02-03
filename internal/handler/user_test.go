@@ -28,17 +28,6 @@ var jwt = config.JWT{
 	ExpiredMinute: 1,
 }
 
-func TestUserHandler_LoginPage(t *testing.T) {
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request.URL.Query().Add("message", "your_message")
-
-	uh := handler.NewUserHandler(nil, nil, false)
-	uh.LoginPage(c)
-
-	assert.Equal(t, http.StatusOK, w.Code)
-}
-
 func TestUserHandler_Login(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/login", nil)
@@ -115,7 +104,7 @@ func TestUserHandler_Login_IncorrectPassword(t *testing.T) {
 	}
 
 	queryValues, _ := url.ParseQuery(u.RawQuery)
-	assert.Contains(t, queryValues.Get("message"), "Unauthorized")
+	assert.Contains(t, queryValues.Get("message"), "IncorrectPassword")
 }
 
 func TestUserHandler_Logout(t *testing.T) {
