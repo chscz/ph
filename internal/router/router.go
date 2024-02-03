@@ -5,13 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitGin(uh *handler.UserHandler, ph *handler.ProductHandler) *gin.Engine {
+func InitGin(uh *handler.UserHandler, ph *handler.ProductHandler, localDebugMode bool) *gin.Engine {
 	r := gin.Default()
 
-	// intellij debug 환경
-	//r.LoadHTMLGlob("templates/*")
-	// docker 환경
-	r.LoadHTMLGlob("/app/templates/*")
+	if localDebugMode {
+		r.LoadHTMLGlob("templates/*")
+	} else {
+		r.LoadHTMLGlob("/app/templates/*")
+	}
 
 	r.Use(AuthMiddleware(uh.Auth.JWTSecretKey))
 

@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 
 	"github.com/caarlos0/env/v10"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	MySQL        MySQL `envPrefix:"MYSQL_"`
-	JWT          JWT   `envPrefix:"JWT_"`
-	JSONRespType bool  `envPrefix:"JSON_RESP_TYPE_"`
+	MySQL          MySQL `envPrefix:"MYSQL_"`
+	JWT            JWT   `envPrefix:"JWT_"`
+	JSONRespType   bool  `env:"JSON_RESP_TYPE"`
+	LocalDebugMode bool  `env:"LOCAL_DEBUG_MODE"`
 }
 
 func (c Config) String() string {
@@ -30,13 +32,13 @@ func LoadFromEnv() (Config, error) {
 			SecretKey:     "",
 			ExpiredMinute: 0,
 		},
-		JSONRespType: false,
+		JSONRespType:   false,
+		LocalDebugMode: false,
 	}
 
 	// .env -> 환경변수 등록
-	//if err := godotenv.Load(".env"); err != nil {
-	//	return Config{}, err
-	//}
+	_ = godotenv.Load(".env")
+
 	// 환경변수 -> Config{} 등록
 	if err := env.Parse(&cfg); err != nil {
 		return Config{}, err

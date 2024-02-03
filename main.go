@@ -33,7 +33,7 @@ func main() {
 	uh := handler.NewUserHandler(mysql.UserRepo{DB: db}, ua, cfg.JSONRespType)
 	mh := handler.NewProductHandler(mysql.ProductRepo{DB: db}, cfg.JSONRespType)
 
-	r := router.InitGin(uh, mh)
+	r := router.InitGin(uh, mh, cfg.LocalDebugMode)
 
 	if err = r.Run(); err != nil {
 		fmt.Println(err)
