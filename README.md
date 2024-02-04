@@ -64,6 +64,7 @@
       - 페이지 이동
 
 # 기타
+- DDL 및 테스트 데이터 쿼리 -> init.sql
 - 웹페이지 동작을 위해 우선 html 처리하여 요구사항에 맞는 json response 는 웹페이지 하단 별도 추가
 - 테스트 데이터 불필요시 init.sql 하단에 있는 테스트데이터 쿼리 주석 후 docker image build
 - `ph` 실행 소요시간 보다 `mysql` 이미지 실행에 시간이 더 길어 container 배포 직후엔 `connection refused` 오류가 발생하나 5초에 한 번씩 DB 연결 재시도하므로 몇 번 연결 실패 후 자동으로 연결됨 
