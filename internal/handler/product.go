@@ -139,7 +139,6 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	price, _ := strconv.Atoi(c.PostForm("price"))
 	cost, _ := strconv.Atoi(c.PostForm("cost"))
 	p := &Product{
-		ID:          0,
 		Category:    c.PostForm("category"),
 		Price:       price,
 		Cost:        cost,

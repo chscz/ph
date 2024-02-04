@@ -31,9 +31,9 @@ func InitGin(uh *handler.UserHandler, ph *handler.ProductHandler, localDebugMode
 		productGroup.POST("/create", ph.CreateProduct)
 
 		productGroup.GET("/update/:id", ph.UpdateProductPage)
-		productGroup.POST("/update/:id", ph.UpdateProduct)
+		productGroup.PUT("/update/:id", ph.UpdateProduct)
 
-		productGroup.GET("/delete/:id", ph.DeleteProduct)
+		productGroup.DELETE("/delete/:id", ph.DeleteProduct)
 
 		productGroup.GET("/detail/:id", ph.GetProductDetail)
 		productGroup.GET("/search", ph.SearchProduct)
