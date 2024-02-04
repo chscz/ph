@@ -29,7 +29,7 @@ func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {
 
 	var db *gorm.DB
 	var err error
-	retryCount := 10
+	retryCount := 20
 	for i := 0; i < retryCount; i++ {
 		dsn := mysqlCfg.FormatDSN()
 		db, err = gorm.Open(gormmysql.Open(dsn), &gorm.Config{})
@@ -39,6 +39,9 @@ func InitMYSQL(cfg config.MySQL) (*gorm.DB, error) {
 
 		log.Printf("Failed to connect to MySQL. Retrying (%d/%d)...\n", i+1, retryCount)
 		time.Sleep(time.Second * 5)
+		if i == retryCount-1 {
+			panic(err)
+		}
 	}
 
 	conn, err := db.DB()

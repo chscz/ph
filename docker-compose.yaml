@@ -17,7 +17,7 @@ services:
       JWT_SECRET_KEY: JWTSecretKey
       JWT_EXPIRED_MINUTE: 10
   mysql:
-    image: mysql:5.7
+    image: mysql:5.7.31
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: "1111"
@@ -29,3 +29,4 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
+      - --innodb-use-native-aio=0
